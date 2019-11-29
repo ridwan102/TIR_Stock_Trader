@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date and Time</th>
+                <th>Buy/Sell</th>
+                <th>Stock</th>
+                <th>Shares</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+    {% for stock in stocks %}
+        <tr>
+        <td> {{stock["datetime"]}}</td>
+        <td> {{stock["buysell"]}} </td>
+        <td> {{stock["stock"]}} </td>
+        <td> {{stock["shares"]}} </td>
+        <td> {{stock["price"] | usd}} </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+
