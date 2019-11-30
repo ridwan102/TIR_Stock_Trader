@@ -1,8 +1,9 @@
 import os
 
-from cs50 import SQL
+# from cs50 import SQL: removed due to heroku
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy #imported for heroku
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -11,6 +12,18 @@ from helpers import login_required, lookup, usd
 
 # Configure application
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -34,7 +47,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+# db = SQL("sqlite:///finance.db") removed for heroku
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -52,6 +65,9 @@ def register():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
+        users = User.query.order_by(User.id).all()
+
+        """
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
 
@@ -83,9 +99,14 @@ def register():
         # saves password to hash
         hash = generate_password_hash(request.form.get("password"))
 
-        # adds username to form
-        new_user_id = db.execute("INSERT INTO users(username, hash) VALUES(:username, :hash)",
-                                 username=request.form.get("username"), hash=hash)
+        """
+        # adds username to form; removed for heroku
+        # new_user_id = db.execute("INSERT INTO users(username, hash) VALUES(:username, :hash)",
+        #                         username=request.form.get("username"), hash=hash)
+
+        new_user = User(name)
+        db.session.add(new_user)
+        db.session.commit()
 
         # Save user id into session
         session["user_id"] = new_user_id
