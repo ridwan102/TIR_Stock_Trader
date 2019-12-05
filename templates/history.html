@@ -10,20 +10,20 @@
             <tr>
                 <th>Date and Time</th>
                 <th>Buy/Sell</th>
-                <th>Stock</th>
-                <th>Shares</th>
+                <th>Stock Name</th>
+                <th>Stock Symbol</th>
                 <th>Price</th>
+                <th>Shares</th>
             </tr>
         </thead>
-    {% for stock in stocks %}
+    {% for transaction in history %}
         <tr>
-        <td> {{stock["datetime"]}}</td>
-        <td> {{stock["buysell"]}} </td>
-        <td> {{stock["stock"]}} </td>
-        <td> {{stock["shares"]}} </td>
-        <td> {{stock["price"] | usd}} </td>
+        <td> {{transaction["datetime"]}}</td>
+        <td> {{transaction["buysell"]}} </td>
+        <td> {{transaction["stockname"]}} </td>
+        <td> {{transaction["stocksymbol"]}} </td>
+        <td> {{transaction["stockprice"] | usd}} </td>
+        <td> {{transaction["stockshares"]}} </td>
         </tr>
     {% endfor %}
 {% endblock %}
-
-

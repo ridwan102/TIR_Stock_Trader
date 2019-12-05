@@ -20,8 +20,8 @@
         <td> {{stock["symbol"]}}</td>
         <td> {{stock["stock"]}} </td>
         <td> {{stock["shares"]}} </td>
-        <td> {{stock["price"] | usd}} </td>
-        <td> {{stock["total"] | usd}} </td>
+        <td> {{stock["price"]}} </td>
+        <td> {{stock["total"]}} </td>
         </tr>
     {% endfor %}
     </table>
@@ -34,11 +34,9 @@
             </tr>
         </thead>
         <tr>
-            <td>{{total | usd}}</td>
-            <td>{{remainder | usd}}</td>
-            <td>{{stock_totals | usd}}</td>
+            <td>{{total}}</td>
+            <td>{{remainder}}</td>
+            <td>{{stock_totals}}</td>
         </tr>
     </table>
 {% endblock %}
-
-

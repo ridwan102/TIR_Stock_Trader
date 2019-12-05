@@ -1,12 +1,12 @@
 import os
 
-# from cs50 import SQL: removed due to heroku
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy #imported for heroku
+from flask_sqlalchemy import SQLAlchemy
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 from helpers import login_required, lookup, usd
 
@@ -14,16 +14,54 @@ from helpers import login_required, lookup, usd
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+
 db = SQLAlchemy(app)
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), unique=True, nullable=False)
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    stockname = db.Column(db.String(80), unique=True, nullable=False)
+    stocksymbol = db.Column(db.String(80), unique=True, nullable=False)
+    stockprice = db.Column(db.Integer, nullable=False)
+    stockshares = db.Column(db.Integer, nullable=False)
+    #totalstock = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, username, stockname, stocksymbol, stockshares, stockprice):#, totalstock):
+        self.username = username
+        self.stockname = stockname
+        self.stocksymbol = stocksymbol
+        self.stockprice = stockprice
+        self.stockshares = stockshares
+        #self.totalstock = totalstock
+
+class History(db.Model):
+    datetime = db.Column(db.DateTime(), primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    buysell = db.Column(db.String(4), nullable=False)
+    stockname = db.Column(db.String(80), nullable=False)
+    stocksymbol = db.Column(db.String(80), nullable=False)
+    stockprice = db.Column(db.Integer, nullable=False)
+    stockshares = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, datetime, username, buysell, stockname, stocksymbol, stockshares, stockprice):
+        self.datetime = datetime
+        self.username = username
+        self.buysell = buysell
+        self.stockname = stockname
+        self.stocksymbol = stocksymbol
+        self.stockprice = stockprice
+        self.stockshares = stockshares
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -46,9 +84,6 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
-# db = SQL("sqlite:///finance.db") removed for heroku
-
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
     #set up api key for the stock quote engine
@@ -65,51 +100,47 @@ def register():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        users = User.query.order_by(User.id).all()
+        # users = User.query.order_by(User.id).all()
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
 
-        """
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        user = User.query.filter_by(username=username).first()
 
         # Enter valid username
-        if not request.form.get("username"):
+        if not username:
             flash("Please enter a username")
             return redirect("/register")
 
         # Enter valid password
-        elif not request.form.get("password"):
+        elif not password:
             flash("Please enter a password")
             return redirect("/register")
 
         # Ensure confirmation password was submitted
-        elif not request.form.get("confirmation"):
+        elif not confirmation:
             flash("Please confirm password")
             return redirect("/register")
 
         # Ensure passwords match
-        elif request.form.get("password") != request.form.get("confirmation"):
+        elif password != confirmation:
             flash("Passwords do not match")
             return redirect("/register")
 
-        # Ensure username is not taken
-        elif len(rows) == 1:
+        elif user:
             flash("Username is already taken")
             return redirect("/register")
 
         # saves password to hash
-        hash = generate_password_hash(request.form.get("password"))
+        password = generate_password_hash(password)
 
-        """
-        # adds username to form; removed for heroku
-        # new_user_id = db.execute("INSERT INTO users(username, hash) VALUES(:username, :hash)",
-        #                         username=request.form.get("username"), hash=hash)
-
-        new_user = User(name)
+        new_user = User(username,password)
         db.session.add(new_user)
         db.session.commit()
 
         # Save user id into session
-        session["user_id"] = new_user_id
+        session["user_id"] = User.query.filter_by(username=username).first()
 
         # Redirect user to home page
         return redirect("/")
@@ -123,33 +154,35 @@ def register():
 def login():
     """Log user in"""
 
-    # Forget any user_id
-    # session.clear()
-
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username",
-                          username=request.form.get("username"))
+        username = request.form.get("username")
+        password = request.form.get("password")
 
         # Ensure username was submitted
-        if not request.form.get("username"):
+        if not username:
             flash("Please provide username")
             return redirect("/login")
 
         # Ensure password was submitted
-        elif not request.form.get("password"):
+        elif not password:
             flash("Please provide password")
             return redirect("/login")
 
+        user = User.query.filter_by(username=username).first()
+
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            flash("Invalid username/password")
+        if not user:
+            flash("Invalid username")
+            return redirect("/login")
+
+        if not check_password_hash(user.password, password):
+            flash("Invalid password")
             return redirect("/login")
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = user.username
 
         # Redirect user to home page
         return redirect("/")
@@ -176,11 +209,13 @@ def index():
     """Show portfolio of stocks"""
 
     # calls current user
-    user = db.execute("SELECT username FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["username"]
+    username = session["user_id"]
 
     # deletes rows with no stocks
-    db.execute("DELETE FROM buy WHERE shares = 0")
+    # db.execute("DELETE FROM buy WHERE shares = 0")
+    Transactions.query.filter_by(username=username, stockshares=0).delete(synchronize_session=False)
 
+    """
     # updates total in dollar value amount of bought stocks
     db.execute("UPDATE buy SET total=price*shares")
 
@@ -208,7 +243,8 @@ def index():
     # calculats total of remainder and total investments
     total = remainder + stock_totals
 
-    return render_template("index.html", stocks=stocks, stock_totals=stock_totals, remainder=remainder, total=total)
+    """
+    return render_template("index.html") #, stocks=stocks, stock_totals=stock_totals, remainder=remainder, total=total)
 
 
 @app.route("/quote", methods=["GET", "POST"])
@@ -255,38 +291,39 @@ def buy():
             return redirect("/buy")
 
         if shares <= 0:
-            flash("Please enter a number greater than 0", 400)
+            flash("Please enter a number greater than 0")
             return redirect("/buy")
 
         # calls remainder cash on account
-        remainder = db.execute("SELECT remainder FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["remainder"]
+        # remainder = db.execute("SELECT remainder FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["remainder"]
 
         # calls current price of stock
         price = symbol["price"]
 
         # if desired total to be bought is greater than remaining cash, flashes error message
-        if price * shares > remainder:
-            flash("Not enough funds available")
-            return redirect("/buy")
+        # if price * shares > remainder:
+        #    flash("Not enough funds available")
+        #    return redirect("/buy")
 
         # calls current user
-        user = db.execute("SELECT username FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["username"]
+        username = session["user_id"]
 
         # calls amount of current of shares for user
-        user_shares = db.execute("SELECT shares FROM buy WHERE user = :user AND stock=:stock",
-                                 user=user, stock=symbol["name"])
+        usershares = Transactions.query.filter_by(username=username,stocksymbol=symbol["symbol"]).first()
 
         # if the current stock is not in the users profile, it inserts it or else it updates the table
-        if not user_shares:
-            db.execute("INSERT INTO buy (user, stock, symbol, price, shares) VALUES(:user, :stock, :symbol, :price, :shares)",
-                       user=user, stock=symbol["name"], symbol=symbol["symbol"], price=price, shares=shares)
+        if not usershares:
+            transactions = Transactions(username=username, stockname=symbol["name"], stocksymbol=symbol["symbol"], stockprice=price, stockshares=shares)
+            db.session.add(transactions)
+            db.session.commit()
         else:
-            db.execute("UPDATE buy SET shares = shares + :shares WHERE user=:user AND stock = :stock",
-                       shares=shares, user=user, stock=symbol["name"])
+            usershares.stockshares += shares
+            db.session.commit()
 
         # inserts transaction into history
-        db.execute("INSERT INTO history (user, buysell, stock, price, shares) VALUES(:user, 'Buy', :stock, :price, :shares)",
-                   user=user, stock=symbol["name"], price=price, shares=shares)
+        db.session.add(History(datetime=datetime.now().isoformat(timespec='milliseconds'), username=username,
+        buysell='Buy', stockname=symbol["name"], stocksymbol=symbol["symbol"], stockprice=price, stockshares=shares))
+        db.session.commit()
 
         flash(f"Purchased {shares} shares of {symbol['name']}")
 
@@ -302,14 +339,17 @@ def sell():
     """Sell shares of stock"""
 
     # initializes to current user
-    user = db.execute("SELECT username FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["username"]
+    # user = db.execute("SELECT username FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["username"]
+    username = session["user_id"]
 
     # initializes symbol for buy table for current user
-    symbols = db.execute("SELECT symbol FROM buy WHERE user = :user", user=user)
+    # symbols = db.execute("SELECT symbol FROM buy WHERE user = :user", user=user)
+    stocksymbol = db.session.query(Transactions.stocksymbol)#.filter_by(username=username)
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
+        """
         # initializes symbol for buy table for current user
         symbol = symbols[0]["symbol"]
 
@@ -350,11 +390,12 @@ def sell():
         flash(f"Sold {shares} shares of {stock}")
 
         return redirect("/")
+        """
 
     else:
 
         # User reached route via GET (as by clicking a link or via redirect)
-        return render_template("sell.html", symbols=symbols)
+        return render_template("sell.html", stocksymbol=stocksymbol)
 
 
 @app.route("/history")
@@ -362,12 +403,12 @@ def sell():
 def history():
 
     # calls current user
-    user = db.execute("SELECT username FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["username"]
+    username = session["user_id"]
 
     # initializes history table for current user
-    stocks = db.execute("SELECT * FROM history WHERE user = :user", user=user)
+    history = History.query.filter_by(username=username)
 
-    return render_template("history.html", stocks=stocks)
+    return render_template("history.html", history=history)
 
 
 def errorhandler(e):

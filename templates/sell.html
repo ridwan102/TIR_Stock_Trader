@@ -7,14 +7,12 @@
 {% block main %}
     <form action="/sell" method="post">
         <div class="form-group">
-        <dl>
             <dt>Stocks
-                <dd><select name="symbol">
-                    {% for symbol in symbols %}
-                        <option value="{{ symbol["symbol"] }}">{{ symbol["symbol"] }}</option>
-                    {% endfor %}
+            <dd><select name="symbol">
+                  {% for symbol in stocksymbol %}
+                      <option value="{{ symbol["symbol"] }}">{{ symbol["symbol"] }}</option>
+                  {% endfor %}
                 </select>
-        </dl>
         </div>
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="shares" placeholder="Number of Shares" type="number">
