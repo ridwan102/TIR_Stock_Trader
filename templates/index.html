@@ -8,20 +8,20 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Symbol</th>
                 <th>Name</th>
-                <th>Shares</th>
+                <th>Symbol</th>
                 <th>Price</th>
+                <th>Shares</th>
                 <th>Total</th>
             </tr>
         </thead>
-    {% for stock in stocks %}
+    {% for transaction in transactions %}
         <tr>
-        <td> {{stock["symbol"]}}</td>
-        <td> {{stock["stock"]}} </td>
-        <td> {{stock["shares"]}} </td>
-        <td> {{stock["price"]}} </td>
-        <td> {{stock["total"]}} </td>
+        <td> {{transaction["stockname"]}} </td>
+        <td> {{transaction["stocksymbol"]}}</td>
+        <td> {{transaction["stockprice"] | usd}} </td>
+        <td> {{transaction["stockshares"]}} </td>
+        <td> {{transaction["stocktotal"] | usd}} </td>
         </tr>
     {% endfor %}
     </table>
@@ -34,9 +34,9 @@
             </tr>
         </thead>
         <tr>
-            <td>{{total}}</td>
-            <td>{{remainder}}</td>
-            <td>{{stock_totals}}</td>
+            <td>{{total | usd}}</td>
+            <td>{{remainder | usd}}</td>
+            <td>{{stocktotal | usd}}</td>
         </tr>
     </table>
 {% endblock %}

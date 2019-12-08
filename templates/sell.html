@@ -9,8 +9,8 @@
         <div class="form-group">
             <dt>Stocks
             <dd><select name="symbol">
-                  {% for symbol in stocksymbol %}
-                      <option value="{{ symbol["symbol"] }}">{{ symbol["symbol"] }}</option>
+                  {% for name in stockname %}
+                      <option value="{{ name["stockname"] }}">{{ name["stockname"] }}</option>
                   {% endfor %}
                 </select>
         </div>

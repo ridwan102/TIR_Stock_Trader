@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from sqlalchemy import func
 
 from helpers import login_required, lookup, usd
 
@@ -23,10 +24,14 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), unique=True, nullable=False)
+    cash = db.Column(db.Integer, nullable=False)
+    remainder = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, cash, remainder):
         self.username = username
         self.password = password
+        self.cash = cash
+        self.remainder = remainder
 
 class Transactions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,15 +40,15 @@ class Transactions(db.Model):
     stocksymbol = db.Column(db.String(80), unique=True, nullable=False)
     stockprice = db.Column(db.Integer, nullable=False)
     stockshares = db.Column(db.Integer, nullable=False)
-    #totalstock = db.Column(db.Integer, nullable=False)
+    stocktotal = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, username, stockname, stocksymbol, stockshares, stockprice):#, totalstock):
+    def __init__(self, username, stockname, stocksymbol, stockshares, stockprice, stocktotal):
         self.username = username
         self.stockname = stockname
         self.stocksymbol = stocksymbol
         self.stockprice = stockprice
         self.stockshares = stockshares
-        #self.totalstock = totalstock
+        self.stocktotal = stocktotal
 
 class History(db.Model):
     datetime = db.Column(db.DateTime(), primary_key=True)
@@ -135,8 +140,7 @@ def register():
         # saves password to hash
         password = generate_password_hash(password)
 
-        new_user = User(username,password)
-        db.session.add(new_user)
+        db.session.add(User(username=username,password=password,cash=10000,remainder=10000))
         db.session.commit()
 
         # Save user id into session
@@ -182,7 +186,7 @@ def login():
             return redirect("/login")
 
         # Remember which user has logged in
-        session["user_id"] = user.username
+        session["user_id"] = user
 
         # Redirect user to home page
         return redirect("/")
@@ -211,48 +215,45 @@ def index():
     # calls current user
     username = session["user_id"]
 
+    # calls total of investments plus remainder for current user
+    total = username.cash
+
+    # calls remaining cash for current user
+    remainder = username.remainder
+
     # deletes rows with no stocks
     # db.execute("DELETE FROM buy WHERE shares = 0")
-    Transactions.query.filter_by(username=username, stockshares=0).delete(synchronize_session=False)
+    # Transactions.query.filter_by(username=username, stockshares=0).delete(synchronize_session=False)
 
-    """
-    # updates total in dollar value amount of bought stocks
-    db.execute("UPDATE buy SET total=price*shares")
+    # tries to call transactions if current user
+    try:
+        # initializes transactions table for current user
+        transactions = Transactions.query.filter_by(username=username.username)
 
-    # initializes buy table for current user
-    stocks = db.execute("SELECT * FROM buy WHERE user = :user", user=user)
+        # totals all stock investments for current user
+        stocktotal = transactions.with_entities(func.sum(Transactions.stocktotal).label("total")).first().total
 
-    # totals all stock investments for current user
-    stock_total = db.execute("SELECT SUM(total) FROM buy WHERE user = :user", user=user)
+        # calculates remainder amount of cash
+        remainder = total - stocktotal
+        # updates remainder
+        username.remainder = remainder
+        db.session.commit()
 
-    # calls amount of cash user currently has on hand
-    cash = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id=session["user_id"])
+    # if new user then defaults to this
+    except:
 
-    # check for new users that do not have any investments or else there is an error
-    if not stock_total[0]['SUM(total)']:
-        stock_totals = 0
-    else:
-        stock_totals = stock_total[0]['SUM(total)']
+        # calculates total stocks invested based on cash total and remainder; for a new user it will always be 0
+        stocktotal = total - remainder
 
-    # calculators remainder amount of cash
-    remainder = cash[0]['cash'] - stock_totals
-
-    # updates remainder amount of cash
-    db.execute("UPDATE users SET remainder = :remainder WHERE username=:username", remainder=remainder, username=user)
-
-    # calculats total of remainder and total investments
-    total = remainder + stock_totals
-
-    """
-    return render_template("index.html") #, stocks=stocks, stock_totals=stock_totals, remainder=remainder, total=total)
-
+    # returns html template
+    return render_template("index.html", total=total, remainder=remainder, transactions=transactions, stocktotal=stocktotal)
 
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
     """Get stock quote."""
-    # User reached route via POST (as by submitting a form via POST)
 
+    # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         symbol = lookup(request.form.get("symbol"))
 
@@ -294,34 +295,40 @@ def buy():
             flash("Please enter a number greater than 0")
             return redirect("/buy")
 
+        # calls current user
+        username = session["user_id"]
+
         # calls remainder cash on account
-        # remainder = db.execute("SELECT remainder FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["remainder"]
+        remainder = username.remainder
 
         # calls current price of stock
         price = symbol["price"]
 
         # if desired total to be bought is greater than remaining cash, flashes error message
-        # if price * shares > remainder:
-        #    flash("Not enough funds available")
-        #    return redirect("/buy")
+        if price * shares > remainder:
+            flash("Not enough funds available")
+            return redirect("/buy")
 
-        # calls current user
-        username = session["user_id"]
+        try:
 
-        # calls amount of current of shares for user
-        usershares = Transactions.query.filter_by(username=username,stocksymbol=symbol["symbol"]).first()
+            # calls amount of current of shares for user
+            usershares = Transactions.query.filter_by(username=username,stocksymbol=symbol["symbol"]).first()
 
-        # if the current stock is not in the users profile, it inserts it or else it updates the table
-        if not usershares:
-            transactions = Transactions(username=username, stockname=symbol["name"], stocksymbol=symbol["symbol"], stockprice=price, stockshares=shares)
-            db.session.add(transactions)
-            db.session.commit()
-        else:
+            # adds that amount of shares to stock
             usershares.stockshares += shares
+            usershares.stocktotal = usershares.stockprice*usershares.stockshares
+            db.session.commit()
+
+        except:
+
+            # if the current stock is not in the users profile, it inserts it or else it updates the table
+            transactions = Transactions(username=username.username, stockname=symbol["name"], stocksymbol=symbol["symbol"],
+            stockprice=price, stockshares=shares, stocktotal=price*shares)
+            db.session.add(transactions)
             db.session.commit()
 
         # inserts transaction into history
-        db.session.add(History(datetime=datetime.now().isoformat(timespec='milliseconds'), username=username,
+        db.session.add(History(datetime=datetime.now().isoformat(timespec='milliseconds'), username=username.username,
         buysell='Buy', stockname=symbol["name"], stocksymbol=symbol["symbol"], stockprice=price, stockshares=shares))
         db.session.commit()
 
@@ -339,17 +346,14 @@ def sell():
     """Sell shares of stock"""
 
     # initializes to current user
-    # user = db.execute("SELECT username FROM users WHERE id = :user_id", user_id=session["user_id"])[0]["username"]
     username = session["user_id"]
 
     # initializes symbol for buy table for current user
-    # symbols = db.execute("SELECT symbol FROM buy WHERE user = :user", user=user)
-    stocksymbol = db.session.query(Transactions.stocksymbol)#.filter_by(username=username)
+    transactions = Transactions.query.filter_by(username=username.username)
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        """
         # initializes symbol for buy table for current user
         symbol = symbols[0]["symbol"]
 
@@ -365,9 +369,11 @@ def sell():
             return redirect("/sell")
 
         # calls total shares for current user and stock
-        total_shares = db.execute("SELECT shares FROM buy WHERE user=:user AND symbol = :symbol",
-                                  user=user, symbol=symbol)[0]["shares"]
+        # total_shares = db.execute("SELECT shares FROM buy WHERE user=:user AND symbol = :symbol",
+        #                          user=user, symbol=symbol)[0]["shares"]
+        # totalshares = Transactions.query.filter_by(username=username.username)transactions.filter_by(stockname=transactions.stockname).stockshares.first()
 
+        """
         # if shares requested to sell is greater than total shares, returns error
         if shares > total_shares:
             flash("Not enough shares")
@@ -395,7 +401,7 @@ def sell():
     else:
 
         # User reached route via GET (as by clicking a link or via redirect)
-        return render_template("sell.html", stocksymbol=stocksymbol)
+        return render_template("sell.html", stockname=transactions)
 
 
 @app.route("/history")
