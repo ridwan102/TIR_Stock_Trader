@@ -25,17 +25,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), unique=True, nullable=False)
-    cash = db.Column(db.Integer, nullable=False)
-    remainder = db.Column(db.Integer, nullable=False)
+    cash = db.Column(db.Float(7), nullable=False)
+    remainder = db.Column(db.Float(7), nullable=False)
 
 class Transactions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     stockname = db.Column(db.String(80), unique=True, nullable=False)
     stocksymbol = db.Column(db.String(80), unique=True, nullable=False)
-    stockprice = db.Column(db.Integer, nullable=False)
+    stockprice = db.Column(db.Float(7), nullable=False)
     stockshares = db.Column(db.Integer, nullable=False)
-    stocktotal = db.Column(db.Integer, nullable=False)
+    stocktotal = db.Column(db.Float(7), nullable=False)
 
 class History(db.Model):
     datetime = db.Column(db.DateTime(), primary_key=True)
@@ -43,8 +43,8 @@ class History(db.Model):
     buysell = db.Column(db.String(4), nullable=False)
     stockname = db.Column(db.String(80), nullable=False)
     stocksymbol = db.Column(db.String(80), nullable=False)
-    stockprice = db.Column(db.Integer, nullable=False)
-    stockshares = db.Column(db.Integer, nullable=False)
+    stockprice = db.Column(db.Float(7), nullable=False)
+    stockshares = db.Column(db.Float(7), nullable=False)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -334,7 +334,7 @@ def sell():
 
     # initializes to current user
     username = session["user_id"]
-    
+
     if request.method == "GET":
 
         # initializes name for tranactions table for current user
