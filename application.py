@@ -80,6 +80,10 @@ if not os.environ.get("API_KEY"):
 def register():
     """Register user"""
 
+    # User reached route via GET (as by clicking a link or via redirect)
+    if request.method == "GET":
+        return render_template("register.html")
+
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
@@ -133,6 +137,10 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    if request.method == "GET":
+        return render_template("login.html")
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
