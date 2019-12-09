@@ -28,12 +28,6 @@ class User(db.Model):
     cash = db.Column(db.Integer, nullable=False)
     remainder = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, username, password, cash, remainder):
-        self.username = username
-        self.password = password
-        self.cash = cash
-        self.remainder = remainder
-
 class Transactions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -43,14 +37,6 @@ class Transactions(db.Model):
     stockshares = db.Column(db.Integer, nullable=False)
     stocktotal = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, username, stockname, stocksymbol, stockshares, stockprice, stocktotal):
-        self.username = username
-        self.stockname = stockname
-        self.stocksymbol = stocksymbol
-        self.stockprice = stockprice
-        self.stockshares = stockshares
-        self.stocktotal = stocktotal
-
 class History(db.Model):
     datetime = db.Column(db.DateTime(), primary_key=True)
     username = db.Column(db.String(80), nullable=False)
@@ -59,15 +45,6 @@ class History(db.Model):
     stocksymbol = db.Column(db.String(80), nullable=False)
     stockprice = db.Column(db.Integer, nullable=False)
     stockshares = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, datetime, username, buysell, stockname, stocksymbol, stockshares, stockprice):
-        self.datetime = datetime
-        self.username = username
-        self.buysell = buysell
-        self.stockname = stockname
-        self.stocksymbol = stocksymbol
-        self.stockprice = stockprice
-        self.stockshares = stockshares
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -106,7 +83,7 @@ def register():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        # users = User.query.order_by(User.id).all()
+        # retrieve user entered information
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
@@ -124,7 +101,7 @@ def register():
             flash("Please enter a password")
             return redirect("/register")
 
-        # Ensure confirmation password was submitted
+        # Password was not confirmed
         elif not confirmation:
             flash("Please confirm password")
             return redirect("/register")
@@ -134,6 +111,7 @@ def register():
             flash("Passwords do not match")
             return redirect("/register")
 
+        # if username is taken
         elif user:
             flash("Username is already taken")
             return redirect("/register")
@@ -141,6 +119,7 @@ def register():
         # saves password to hash
         password = generate_password_hash(password)
 
+        # adds username, password, cash available and remainder to table
         db.session.add(User(username=username,password=password,cash=10000,remainder=10000))
         db.session.commit()
 
@@ -162,6 +141,7 @@ def login():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
+        # calls entered username and password
         username = request.form.get("username")
         password = request.form.get("password")
 
@@ -175,6 +155,7 @@ def login():
             flash("Please provide password")
             return redirect("/login")
 
+        # finds entered username in database
         user = User.query.filter_by(username=username).first()
 
         # Ensure username exists and password is correct
@@ -216,14 +197,15 @@ def index():
     # calls current user
     username = session["user_id"]
 
-    # calls total of investments plus remainder for current user
+    # calls total investments for current user
     total = username.cash
 
     # calls remaining cash for current user
     remainder = username.remainder
 
-    # tries to call transactions if current user
+    # tries calling transactions for current user
     try:
+
         # initializes transactions table for current user
         transactions = Transactions.query.filter_by(username=username.username)
 
@@ -232,6 +214,7 @@ def index():
 
         # calculates remainder amount of cash
         remainder = total - stocktotal
+
         # updates remainder
         username.remainder = remainder
         db.session.commit()
@@ -254,6 +237,7 @@ def quote():
     if request.method == "POST":
         symbol = lookup(request.form.get("symbol"))
 
+        # warning if symbol does not exist
         if not symbol:
             flash("Does not exist")
             return redirect("/quote")
@@ -288,6 +272,7 @@ def buy():
             flash("Please enter a valid amount of shares to buy")
             return redirect("/buy")
 
+        # warns the user for entering symbol less than zero
         if shares <= 0:
             flash("Please enter a number greater than 0")
             return redirect("/buy")
@@ -323,6 +308,9 @@ def buy():
             stockprice=price, stockshares=shares, stocktotal=price*shares)
             db.session.add(transactions)
             db.session.commit()
+
+        # deducts bought shares and price back to remainder
+        username.remainder += shares*price
 
         # inserts transaction into history
         db.session.add(History(datetime=datetime.now().isoformat(timespec='milliseconds'), username=username.username,
@@ -361,6 +349,7 @@ def sell():
             flash("Please enter a valid amount of shares to sell")
             return redirect("/sell")
 
+        # if shares is less than 0 then it flashes warning
         if shares <= 0:
             flash("Please enter a valid amount of shares to sell")
             return redirect("/sell")
@@ -368,10 +357,8 @@ def sell():
         # calls current user and stock info
         stockinfo = Transactions.query.filter_by(username=username.username,stockname=selectedstock).first()
 
-        totalshares = stockinfo.stockshares
-
         # if shares requested to sell is greater than total shares, returns error
-        if shares > totalshares:
+        if shares > stockinfo.stockshares:
             flash("Not enough shares")
             return redirect("/sell")
 
