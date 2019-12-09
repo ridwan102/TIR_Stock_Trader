@@ -235,8 +235,11 @@ def index():
 def quote():
     """Get stock quote."""
 
+    if request.method == "GET":
+        return render_template("quote.html")
+
     # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
+    elif request.method == "POST":
         symbol = lookup(request.form.get("symbol"))
 
         # warning if symbol does not exist
@@ -247,17 +250,17 @@ def quote():
         flash(f"{symbol['name']} is ${symbol['price']} per share")
         return redirect("/quote")
 
-    else:
-        return render_template("quote.html")
-
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
     """Buy shares of stock"""
 
+    if request.method == "GET":
+        return render_template("buy.html")
+
     # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
+    elif request.method == "POST":
 
         # calls which stock symbol user input
         symbol = lookup(request.form.get("symbol"))
@@ -323,9 +326,6 @@ def buy():
 
         return redirect("/")
 
-    else:
-        return render_template("buy.html")
-
 
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
@@ -334,12 +334,17 @@ def sell():
 
     # initializes to current user
     username = session["user_id"]
+    
+    if request.method == "GET":
 
-    # initializes name for tranactions table for current user
-    stocknames = Transactions.query.filter_by(username=username.username, stockname=Transactions.stockname)
+        # initializes name for tranactions table for current user
+        stocknames = Transactions.query.filter_by(username=username.username, stockname=Transactions.stockname)
+
+        # User reached route via GET (as by clicking a link or via redirect)
+        return render_template("sell.html", stockname=stocknames)
 
     # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
+    elif request.method == "POST":
 
         # initializes selected stockname for transactions table for current user
         selectedstock = request.form.get("stockname")
@@ -387,11 +392,6 @@ def sell():
         flash(f"Sold {shares} shares of {selectedstock}")
 
         return redirect("/")
-
-    else:
-
-        # User reached route via GET (as by clicking a link or via redirect)
-        return render_template("sell.html", stockname=stocknames)
 
 
 @app.route("/history")
