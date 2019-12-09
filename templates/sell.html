@@ -8,7 +8,7 @@
     <form action="/sell" method="post">
         <div class="form-group">
             <dt>Stocks
-            <dd><select name="symbol">
+            <dd><select name="stockname">
                   {% for name in stockname %}
                       <option value="{{ name["stockname"] }}">{{ name["stockname"] }}</option>
                   {% endfor %}

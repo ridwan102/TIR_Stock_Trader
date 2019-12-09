@@ -221,10 +221,6 @@ def index():
     # calls remaining cash for current user
     remainder = username.remainder
 
-    # deletes rows with no stocks
-    # db.execute("DELETE FROM buy WHERE shares = 0")
-    # Transactions.query.filter_by(username=username, stockshares=0).delete(synchronize_session=False)
-
     # tries to call transactions if current user
     try:
         # initializes transactions table for current user
@@ -348,14 +344,14 @@ def sell():
     # initializes to current user
     username = session["user_id"]
 
-    # initializes symbol for buy table for current user
-    transactions = Transactions.query.filter_by(username=username.username)
+    # initializes name for tranactions table for current user
+    stocknames = Transactions.query.filter_by(username=username.username, stockname=Transactions.stockname)
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        # initializes symbol for buy table for current user
-        symbol = symbols[0]["symbol"]
+        # initializes selected stockname for transactions table for current user
+        selectedstock = request.form.get("stockname")
 
         # if share value to sell is not entered or shares are equal or less than 0, returns apology
         try:
@@ -368,40 +364,44 @@ def sell():
             flash("Please enter a valid amount of shares to sell")
             return redirect("/sell")
 
-        # calls total shares for current user and stock
-        # total_shares = db.execute("SELECT shares FROM buy WHERE user=:user AND symbol = :symbol",
-        #                          user=user, symbol=symbol)[0]["shares"]
-        # totalshares = Transactions.query.filter_by(username=username.username)transactions.filter_by(stockname=transactions.stockname).stockshares.first()
+        # calls current user and stock info
+        stockinfo = Transactions.query.filter_by(username=username.username,stockname=selectedstock).first()
 
-        """
+        totalshares = stockinfo.stockshares
+
         # if shares requested to sell is greater than total shares, returns error
-        if shares > total_shares:
+        if shares > totalshares:
             flash("Not enough shares")
             return redirect("/sell")
 
         # looks up stock price based on symbol
-        price = lookup(symbol)["price"]
-
-        # calls current stock
-        stock = db.execute("SELECT stock FROM buy WHERE user=:user AND symbol = :symbol", user=user, symbol=symbol)[0]["stock"]
+        price = lookup(stockinfo.stocksymbol)["price"]
 
         # updates shares for selected stock
-        db.execute("UPDATE buy SET shares = shares - :shares WHERE user=:user AND symbol = :symbol", shares=shares, user=user,
-                   symbol=symbol)
+        stockinfo.stockshares -= shares
+        db.session.commit()
+
+        # adds sold shares and price back to remainder
+        username.remainder += shares*price
+
+        # deletes row if there are no more stockshares in stock
+        if stockinfo.stockshares == 0:
+            Transactions.query.filter_by(username=username.username, stockname=selectedstock).delete()
+            db.session.commit()
 
         # add transaction to history
-        db.execute("INSERT INTO history (user, buysell, stock, price, shares) VALUES(:user, 'Sell', :stock, :price, :shares)",
-                   user=user, stock=stock, price=price, shares=shares)
+        db.session.add(History(datetime=datetime.now().isoformat(timespec='milliseconds'), username=username.username,
+        buysell='Sell', stockname=selectedstock, stocksymbol=stockinfo.stocksymbol, stockprice=price, stockshares=shares))
+        db.session.commit()
 
-        flash(f"Sold {shares} shares of {stock}")
+        flash(f"Sold {shares} shares of {selectedstock}")
 
         return redirect("/")
-        """
 
     else:
 
         # User reached route via GET (as by clicking a link or via redirect)
-        return render_template("sell.html", stockname=transactions)
+        return render_template("sell.html", stockname=stocknames)
 
 
 @app.route("/history")
@@ -412,7 +412,7 @@ def history():
     username = session["user_id"]
 
     # initializes history table for current user
-    history = History.query.filter_by(username=username)
+    history = History.query.filter_by(username=username.username)
 
     return render_template("history.html", history=history)
 
