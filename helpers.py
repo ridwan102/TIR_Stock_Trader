@@ -1,7 +1,6 @@
 import os
 import requests
 import urllib.parse
-import apikeys
 
 from flask import redirect, render_template, request, session
 from functools import wraps
@@ -23,7 +22,7 @@ def login_required(f):
 
 def lookup(symbol):
     """Look up quote for symbol."""
-    os.system("export API_KEY="+apikeys.APIKEYvalue)
+    os.system("export API_KEY="+"pk_0d1467f2aeb748d0b81f445f22bd6665")
 
     # Contact API
     try:

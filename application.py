@@ -85,7 +85,7 @@ def register():
         return render_template("register.html")
 
     # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
+    elif request.method == "POST":
 
         # retrieve user entered information
         username = request.form.get("username")
@@ -143,7 +143,7 @@ def login():
         return render_template("login.html")
 
     # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
+    elif request.method == "POST":
 
         # calls entered username and password
         username = request.form.get("username")
