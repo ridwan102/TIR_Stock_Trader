@@ -20,6 +20,7 @@ def login_required(f):
     return decorated_function
 
 
+# allows user to call stocks based on symbol
 def lookup(symbol):
     """Look up quote for symbol."""
     os.system("export API_KEY="+"pk_0d1467f2aeb748d0b81f445f22bd6665")
