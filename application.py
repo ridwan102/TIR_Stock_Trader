@@ -194,6 +194,8 @@ def logout():
 def index():
     """Show portfolio of stocks"""
 
+    session["user_id"]
+
     # calls current user
     username = session["user_id"]
 
