@@ -145,6 +145,9 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
+        # finds entered username in database
+        user = User.query.filter_by(username=username).first()
+
         # Ensure username was submitted
         if not username:
             flash("Please provide username")
@@ -155,15 +158,12 @@ def login():
             flash("Please provide password")
             return redirect("/login")
 
-        # finds entered username in database
-        user = User.query.filter_by(username=username).first()
-
         # Ensure username exists and password is correct
-        if not user:
+        elif not user:
             flash("Invalid username")
             return redirect("/login")
 
-        if not check_password_hash(user.password, password):
+        elif not check_password_hash(user.password, password):
             flash("Invalid password")
             return redirect("/login")
 
