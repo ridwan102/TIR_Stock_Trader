@@ -129,10 +129,6 @@ def register():
         # Redirect user to home page
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("register.html")
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
