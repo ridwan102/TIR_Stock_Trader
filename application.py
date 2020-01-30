@@ -376,8 +376,13 @@ def sell():
         stockinfo.stockshares -= shares
         db.session.commit()
 
+        # updates stocktotal for selected app
+        stockinfo.stocktotal = stockinfo.stockprice*stockinfo.stockshares
+        db.session.commit()
+
         # adds sold shares and price back to remainder
         username.remainder += shares*price
+        db.session.commit()
 
         # deletes row if there are no more stockshares in stock
         if stockinfo.stockshares == 0:
