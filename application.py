@@ -131,10 +131,10 @@ def register():
         session["user_id"] = user
 
         # Redirect user to home page
-        return redirect("/index")
+        return redirect("/")
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
 
@@ -155,27 +155,27 @@ def login():
         # Ensure username was submitted
         if not username:
             flash("Please provide username")
-            return redirect("/")
+            return redirect("/login")
 
         # Ensure password was submitted
         elif not password:
             flash("Please provide password")
-            return redirect("/")
+            return redirect("/login")
 
         # Ensure username exists and password is correct
         elif not user:
             flash("Invalid username")
-            return redirect("/")
+            return redirect("/login")
 
         elif not check_password_hash(user.password, password):
             flash("Invalid password")
-            return redirect("/")
+            return redirect("/login")
 
         # Remember which user has logged in
         session["user_id"] = user
 
         # Redirect user to home page
-        return redirect("/index")
+        return redirect("/")
 
 
 @app.route("/logout")
@@ -186,10 +186,10 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("/")
+    return redirect("/login")
 
 
-@app.route("/index")
+@app.route("/")
 @login_required
 def index():
     """Show portfolio of stocks"""
@@ -324,7 +324,7 @@ def buy():
 
         flash(f"Purchased {shares} shares of {symbol['name']}")
 
-        return redirect("/index")
+        return redirect("/")
 
 
 @app.route("/sell", methods=["GET", "POST"])
@@ -396,7 +396,7 @@ def sell():
 
         flash(f"Sold {shares} shares of {selectedstock}")
 
-        return redirect("/index")
+        return redirect("/")
 
 
 @app.route("/history")
