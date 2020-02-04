@@ -134,7 +134,7 @@ def register():
         return redirect("/index")
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
     """Log user in"""
 
@@ -155,21 +155,21 @@ def login():
         # Ensure username was submitted
         if not username:
             flash("Please provide username")
-            return redirect("/login")
+            return redirect("/")
 
         # Ensure password was submitted
         elif not password:
             flash("Please provide password")
-            return redirect("/login")
+            return redirect("/")
 
         # Ensure username exists and password is correct
         elif not user:
             flash("Invalid username")
-            return redirect("/login")
+            return redirect("/")
 
         elif not check_password_hash(user.password, password):
             flash("Invalid password")
-            return redirect("/login")
+            return redirect("/")
 
         # Remember which user has logged in
         session["user_id"] = user
@@ -186,7 +186,7 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("/login")
+    return redirect("/")
 
 
 @app.route("/index")
