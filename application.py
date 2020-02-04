@@ -324,7 +324,7 @@ def buy():
 
         flash(f"Purchased {shares} shares of {symbol['name']}")
 
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/sell", methods=["GET", "POST"])
@@ -396,7 +396,7 @@ def sell():
 
         flash(f"Sold {shares} shares of {selectedstock}")
 
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/history")
