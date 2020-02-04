@@ -98,22 +98,27 @@ def register():
         # Enter valid username
         if not username:
             flash("Please enter a username")
+            return redirect("/register")
 
         # Enter valid password
         elif not password:
             flash("Please enter a password")
+            return redirect("/register")
 
         # Password was not confirmed
         elif not confirmation:
             flash("Please confirm password")
+            return redirect("/register")
 
         # Ensure passwords match
         elif password != confirmation:
             flash("Passwords do not match")
+            return redirect("/register")
 
         # if username is taken
         elif user:
             flash("Username is already taken")
+            return redirect("/register")
 
         # saves password to hash
         password = generate_password_hash(password)
