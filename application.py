@@ -128,7 +128,7 @@ def register():
         db.session.commit()
 
         # Save user id into session
-        session["user_id"] = User.query.filter_by(username=username).first()
+        session["user_id"] = user
 
         # Redirect user to home page
         return redirect("/")
