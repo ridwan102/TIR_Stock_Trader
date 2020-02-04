@@ -131,7 +131,7 @@ def register():
         session["user_id"] = user
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -175,7 +175,7 @@ def login():
         session["user_id"] = user
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/logout")
@@ -189,7 +189,7 @@ def logout():
     return redirect("/login")
 
 
-@app.route("/")
+@app.route("/index")
 @login_required
 def index():
     """Show portfolio of stocks"""
@@ -396,7 +396,7 @@ def sell():
 
         flash(f"Sold {shares} shares of {selectedstock}")
 
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/history")
