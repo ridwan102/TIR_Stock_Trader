@@ -52,7 +52,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
-    response.headers["Cache-Control"] = "no-cache, no-store"#, must-revalidate"
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
@@ -131,7 +131,7 @@ def register():
         session["user_id"] = user
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -175,7 +175,7 @@ def login():
         session["user_id"] = user
 
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/logout")
@@ -189,7 +189,7 @@ def logout():
     return redirect("/login")
 
 
-@app.route("/")
+@app.route("/index")
 @login_required
 def index():
     """Show portfolio of stocks"""
