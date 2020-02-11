@@ -226,9 +226,18 @@ def index():
     #calls current user
     username = session["user_id"]
 
-    """
-
     session["user_id"]
+
+    #calls current user
+    username = session["user_id"]
+
+    worked
+    session["user_id"]
+
+    #calls current user
+    username = session["user_id"]
+
+    """
 
     #calls current user
     username = session["user_id"]
