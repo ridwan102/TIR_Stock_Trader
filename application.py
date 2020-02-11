@@ -172,7 +172,7 @@ def login():
             return redirect("/")
 
         # Remember which user has logged in
-        session["user_id"] = user
+        session["user_id"] = User.query.filter_by(username=username).first()
 
         # Redirect user to home page
         return redirect("/index")
