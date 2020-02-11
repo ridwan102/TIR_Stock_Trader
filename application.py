@@ -128,13 +128,13 @@ def register():
         db.session.commit()
 
         # Save user id into session
-        session["user_id"] = user
+        session["user_id"] = User.query.filter_by(username=username).first()
 
         # Redirect user to home page
         return redirect("/index")
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
     """Log user in"""
 
@@ -324,7 +324,7 @@ def buy():
 
         flash(f"Purchased {shares} shares of {symbol['name']}")
 
-        return redirect("/")
+        return redirect("/index")
 
 
 @app.route("/sell", methods=["GET", "POST"])
