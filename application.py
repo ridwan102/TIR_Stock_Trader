@@ -237,10 +237,14 @@ def index():
     #calls current user
     username = session["user_id"]
 
-    """
-
+    
+    worked 
     #calls current user
     username = session["user_id"]
+
+    """
+
+    username = User.query.filter_by(username=username).first()    
 
     # calls total investments for current user
     total = username.cash
