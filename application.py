@@ -173,6 +173,7 @@ def login():
             return redirect("/")
 
         # Remember which user has logged in
+        # Do not change to session["user_id"] = user; for some reason website does not run properly 
         session["user_id"] = User.query.filter_by(username=username).first()
 
         # Redirect user to home page
@@ -195,6 +196,8 @@ def logout():
 def index():
     """Show portfolio of stocks"""
 
+    session["user_id"] = User.query.filter_by(username=username).first()
+    
     # calls current user
     username = session["user_id"]
 
