@@ -174,7 +174,7 @@ def login():
 
         # Remember which user has logged in
         # Do not change to session["user_id"] = user; for some reason website does not run properly 
-        session["user_id"] = User.query.filter_by(username=username).first()
+        session["user_id"]
 
         # Redirect user to home page
         return redirect("/index")
@@ -236,7 +236,7 @@ def index():
     username = session["user_id"]
 
     """
-    
+
     #calls current user
     username = session["user_id"]
 
