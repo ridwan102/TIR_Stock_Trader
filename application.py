@@ -203,18 +203,18 @@ def index():
     username = session["user_id"]
 
     failed
-    session["user_id"]
-
-    #calls current user
-    username = User.query.filter_by(username=username).first()
-
-    failed
     User.query.filter_by(username=username).first()
 
     #calls current user
     username = User.query.filter_by(username=username).first()
 
     failed
+    session["user_id"]
+
+    #calls current user
+    username = User.query.filter_by(username=username).first()
+
+    failed
     session["user_id"] = User.query.filter_by(username=username).first()
 
     #calls current user
@@ -226,25 +226,19 @@ def index():
     #calls current user
     username = session["user_id"]
 
-    session["user_id"]
-
-    #calls current user
-    username = session["user_id"]
-
+    failed
+    username = User.query.filter_by(username=username).first() 
+    
     worked
     session["user_id"]
 
     #calls current user
     username = session["user_id"]
 
+    """
     
-    worked 
     #calls current user
     username = session["user_id"]
-
-    """
-
-    username = User.query.filter_by(username=username).first()    
 
     # calls total investments for current user
     total = username.cash
