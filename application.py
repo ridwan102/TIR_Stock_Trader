@@ -128,6 +128,7 @@ def register():
         db.session.commit()
 
         # Save user id into session
+        # Do not change to session["user_id"] = user; for some reason website does not run properly 
         session["user_id"] = User.query.filter_by(username=username).first()
 
         # Redirect user to home page
@@ -194,10 +195,8 @@ def logout():
 def index():
     """Show portfolio of stocks"""
 
-    session["user_id"]
-
     # calls current user
-    username = session["user_id"]
+    username = User.query.filter_by(username=username).first()
 
     # calls total investments for current user
     total = username.cash
