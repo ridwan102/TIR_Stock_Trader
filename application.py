@@ -195,13 +195,13 @@ def logout():
 @login_required
 def index():
     """Show portfolio of stocks"""
-
+    """
+    failed
     User.query.filter_by(username=username).first()
 
     #calls current user
     username = session["user_id"]
 
-    """
     failed
     session["user_id"]
 
@@ -226,13 +226,12 @@ def index():
     #calls current user
     username = session["user_id"]
 
-    working
+    """
+
     session["user_id"]
 
     #calls current user
     username = session["user_id"]
-
-    """
 
     # calls total investments for current user
     total = username.cash
