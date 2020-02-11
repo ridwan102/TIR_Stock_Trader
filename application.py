@@ -196,7 +196,7 @@ def index():
     """Show portfolio of stocks"""
 
     # calls current user
-    username = User.query.filter_by(username=username).first()
+    username = session["user_id"]
 
     # calls total investments for current user
     total = username.cash
