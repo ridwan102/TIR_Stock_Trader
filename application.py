@@ -14,6 +14,7 @@ from helpers import login_required, lookup, usd
 # Configure application
 app = Flask(__name__)
 
+#app.config['SECRET_KEY'] = b'\x8c\x85\x9b\x94\xc6\x94~?h\xdbR\xed\x9a"\xf5\xfd\xff\xbf:\xefs\x96n\xe8{\xb3oaOT[\xa3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
@@ -50,12 +51,12 @@ class History(db.Model):
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Ensure responses aren't cached
-@app.after_request
+""" @app.after_request
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
-    return response
+    return response """
 
 # Custom filter
 app.jinja_env.filters["usd"] = usd
@@ -64,7 +65,6 @@ app.jinja_env.filters["usd"] = usd
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_COOKIE_DOMAIN"] = '127.0.0.1'
 Session(app)
 
 # Make sure API key is set
