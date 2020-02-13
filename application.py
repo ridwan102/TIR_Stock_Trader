@@ -14,7 +14,7 @@ from helpers import login_required, lookup, usd
 # Configure application
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.random(24)
+app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
