@@ -11,7 +11,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 #from boto.s3.connection import S3Connection
 
-from helpers import lookup, usd #,login_required 
+from helpers import lookup, usd ,login_required 
 
 # Configure application
 app = Flask(__name__)
@@ -194,7 +194,7 @@ def logout():
     return redirect("/")
 
 @app.route("/index")
-#@login_required
+@login_required
 def index():
 
     """Show portfolio of stocks"""
@@ -242,7 +242,7 @@ def index():
     return render_template("index.html", total=total, remainder=remainder, transactions=transactions, stocktotal=stocktotal)
 
 @app.route("/quote", methods=["GET", "POST"])
-#@login_required
+@login_required
 def quote():
     """Get stock quote."""
 
@@ -263,7 +263,7 @@ def quote():
 
 
 @app.route("/buy", methods=["GET", "POST"])
-#@login_required
+@login_required
 def buy():
     """Buy shares of stock"""
 
@@ -339,7 +339,7 @@ def buy():
 
 
 @app.route("/sell", methods=["GET", "POST"])
-#@login_required
+@login_required
 def sell():
     """Sell shares of stock"""
 
@@ -411,7 +411,7 @@ def sell():
 
 
 @app.route("/history")
-#@login_required
+@login_required
 def history():
 
     # calls current user

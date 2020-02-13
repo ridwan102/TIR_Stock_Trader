@@ -2,23 +2,23 @@ import os
 import requests
 import urllib.parse
 
-from flask import redirect, render_template, request, session, url_for
-#from functools import wraps
+from flask import redirect, render_template, request, session
+from functools import wraps
 
 
-""" def login_required(f):
+def login_required(f):
     
-    Decorate routes to require login.
+    """Decorate routes to require login.
 
-    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
+    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/"""
     
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:
             #changed from login page to index 
-            return redirect(url_for('index'))
+            return redirect("/index")
         return f(*args, **kwargs)
-    return decorated_function """
+    return decorated_function 
 
 
 # allows user to call stocks based on symbol
