@@ -13,7 +13,6 @@ from helpers import login_required, lookup, usd
 
 # Configure application
 app = Flask(__name__)
-app.secret_key = b'G\xa5U\x0e\x00\x90/~=d\xf7\xd1\xa7\\{\x1bL\xbe\xb0!\x89\xc5;n'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
