@@ -51,12 +51,12 @@ class History(db.Model):
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Ensure responses aren't cached
-""" @app.after_request
+@app.after_request
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
-    response.headers["Pragma"] = "no-cache"
-    return response """
+    # response.headers["Pragma"] = "no-cache"
+    return response
 
 # Custom filter
 app.jinja_env.filters["usd"] = usd
