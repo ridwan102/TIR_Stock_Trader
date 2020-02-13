@@ -1,3 +1,4 @@
+#Run app local: in main directory CL "source venv/bin/activate" and then CL "flask run"
 import os
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
@@ -8,13 +9,15 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from boto.s3.connection import S3Connection
 
 from helpers import login_required, lookup, usd
 
 # Configure application
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'f3cfe9ed8fae309f02079dbf'
+#security issue fixed https://devcenter.heroku.com/articles/config-vars 
+# s3 = S3Connection(os.environ['S3_KEY'], os.environ['S3_SECRET'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
