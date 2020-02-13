@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 #security issue fixed https://devcenter.heroku.com/articles/config-vars 
 # s3 = S3Connection(os.environ['S3_KEY'], os.environ['S3_SECRET'])
-app.config['SECRET_KEY'] = os.environ['SECRET KEY']
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
