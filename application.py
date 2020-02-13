@@ -57,7 +57,6 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-
 # Custom filter
 app.jinja_env.filters["usd"] = usd
 
@@ -139,12 +138,15 @@ def register():
 def login():
     """Log user in"""
 
+    # Forget any user_id
+    session.clear()
+
     # User reached route via GET (as by clicking a link or via redirect)
-    if request.method == "GET":
-        return render_template("login.html")
+    # if request.method == "GET":
+        # return render_template("login.html")
 
     # User reached route via POST (as by submitting a form via POST)
-    elif request.method == "POST":
+    if request.method == "POST":
 
         # calls entered username and password
         username = request.form.get("username")
@@ -178,6 +180,10 @@ def login():
 
         # Redirect user to home page
         return redirect("/index")
+        
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("login.html")
 
 
 @app.route("/logout")
