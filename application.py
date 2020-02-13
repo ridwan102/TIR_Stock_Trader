@@ -191,7 +191,7 @@ def logout():
     return redirect("/")
 
 @app.route("/index")
-    @login_required
+@login_required
 def index():
 
     """Show portfolio of stocks"""
