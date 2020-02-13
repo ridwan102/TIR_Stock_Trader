@@ -138,12 +138,9 @@ def register():
 def login():
     """Log user in"""
 
-    # Forget any user_id
-    session.clear()
-
     # User reached route via GET (as by clicking a link or via redirect)
-    # if request.method == "GET":
-        # return render_template("login.html")
+    if request.method == "GET":
+        return render_template("login.html")
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -180,10 +177,6 @@ def login():
 
         # Redirect user to home page
         return redirect("/index")
-        
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("login.html")
 
 
 @app.route("/logout")
@@ -197,7 +190,7 @@ def logout():
     return redirect("/")
 
 @app.route("/index")
-@login_required
+# @login_required
 def index():
 
     """Show portfolio of stocks"""
@@ -278,7 +271,7 @@ def index():
     return render_template("index.html", total=total, remainder=remainder, transactions=transactions, stocktotal=stocktotal)
 
 @app.route("/quote", methods=["GET", "POST"])
-@login_required
+# @login_required
 def quote():
     """Get stock quote."""
 
@@ -299,7 +292,7 @@ def quote():
 
 
 @app.route("/buy", methods=["GET", "POST"])
-@login_required
+# @login_required
 def buy():
     """Buy shares of stock"""
 
@@ -375,7 +368,7 @@ def buy():
 
 
 @app.route("/sell", methods=["GET", "POST"])
-@login_required
+# @login_required
 def sell():
     """Sell shares of stock"""
 
@@ -447,7 +440,7 @@ def sell():
 
 
 @app.route("/history")
-@login_required
+# @login_required
 def history():
 
     # calls current user
