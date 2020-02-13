@@ -194,46 +194,13 @@ def logout():
 def index():
 
     """Show portfolio of stocks"""
+
     """
-    failed
-    User.query.filter_by(username=username).first()
-
-    #calls current user
-    username = session["user_id"]
-
-    failed
-    User.query.filter_by(username=username).first()
-
-    #calls current user
-    username = User.query.filter_by(username=username).first()
-
-    failed
-    session["user_id"]
-
-    #calls current user
-    username = User.query.filter_by(username=username).first()
-
-    failed
-    session["user_id"] = User.query.filter_by(username=username).first()
-
-    #calls current user
-    username = User.query.filter_by(username=username).first()
-
-    failed
-    session["user_id"] = User.query.filter_by(username=username).first()
-
-    #calls current user
-    username = session["user_id"]
-
-    failed
-    username = User.query.filter_by(username=username).first() 
-    
     worked
     session["user_id"]
 
     #calls current user
     username = session["user_id"]
-
     """
     
     #calls current user
