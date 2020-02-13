@@ -190,10 +190,10 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-
-@login_required
 @app.route("/index")
 def index():
+
+    @login_required
     """Show portfolio of stocks"""
     """
     failed
