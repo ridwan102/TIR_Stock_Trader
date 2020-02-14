@@ -198,16 +198,15 @@ def index():
 
     """Show portfolio of stocks"""
 
-    """
-    worked
     session["user_id"]
 
     #calls current user
     username = session["user_id"]
+
     """
-    
     #calls current user
     username = session["user_id"]
+    """
 
     # calls total investments for current user
     total = username.cash
