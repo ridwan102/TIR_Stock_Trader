@@ -4,7 +4,7 @@ import urllib.parse
 
 from flask import Flask, redirect, render_template, request, session
 from functools import wraps
-""" from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 # Configure application
 app = Flask(__name__)
@@ -18,24 +18,27 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), unique=True, nullable=False)
     cash = db.Column(db.Float(7), nullable=False)
-    remainder = db.Column(db.Float(7), nullable=False) """
+    remainder = db.Column(db.Float(7), nullable=False) 
 
-""" def login_required(f):
+def login_required(f):
     
+    """
     Decorate routes to require login.
 
     http://flask.pocoo.org/docs/1.0/patterns/viewdecorators
+
+    """
     
     @wraps(f)
     def decorated_function(*args, **kwargs):
 
         #calls current user
-        #session["user_id"] = User.query.filter_by(username=username).first()
-        if session.get("user_id") is None:
+        
+        if session.get("user_id") is not User.query.filter_by(username=username).first():
             #changed from login page to index 
             return redirect("/index")
         return f(*args, **kwargs)
-    return decorated_function  """
+    return decorated_function
 
 
 # allows user to call stocks based on symbol
