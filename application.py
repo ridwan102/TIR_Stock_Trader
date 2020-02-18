@@ -1,12 +1,12 @@
 #Run app local: in main directory CL "source venv/bin/activate" and then CL "flask run"
 import os
 
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from tempfile import mkdtemp
-from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
+#from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 
@@ -420,14 +420,16 @@ def history():
 
     return render_template("history.html", history=history)
 
+"""
 
 def errorhandler(e):
-    """Handle error"""
+    #Handle error
     if not isinstance(e, HTTPException):
         e = InternalServerError()
     return (e.name, e.code)
 
-
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
+
+"""
