@@ -19,13 +19,9 @@ def login_required(f):
 
         #calls current user
 
-        #if session.get("user_id") is True:
-        try:
-            session.get("user_id")
+        if not session:
             #changed from login page to index 
-        except:
-            redirect("/")
-            #return redirect("/index")
+            return redirect("/")
         return f(*args, **kwargs)
     return decorated_function
 
