@@ -22,7 +22,7 @@ def login_required(f):
         #calls current user
         #retrieve user entered information
 
-        if session.get("user_id") is False:
+        if session.get("user_id") is None:
             #changed from login page to index 
             return redirect("/")
         return f(*args, **kwargs)
