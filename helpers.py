@@ -66,7 +66,7 @@ def login_required(f):
 
         if session.get("user_id") is False:
             #changed from login page to index 
-            return redirect("/index")
+            return redirect("/")
         return f(*args, **kwargs)
     return decorated_function
 
