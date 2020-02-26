@@ -1,4 +1,5 @@
 #Run app local: in main directory CL "source venv/bin/activate" and then CL "flask run"
+#Run locally: add database_url from Heroku
 import os
 
 from flask import Flask, flash, redirect, render_template, request, session
@@ -18,7 +19,7 @@ app = Flask(__name__)
 #security issue fixed https://devcenter.heroku.com/articles/config-vars 
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = "os.environ['DATABASE_URL']"
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
