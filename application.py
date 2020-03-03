@@ -9,7 +9,7 @@ from sqlalchemy import func
 from tempfile import mkdtemp
 #from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from helpers import lookup, usd, login_required 
 
@@ -19,7 +19,7 @@ app = Flask(__name__)
 #security issue fixed https://devcenter.heroku.com/articles/config-vars 
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = "os.environ['DATABASE_URL']"
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -31,7 +31,14 @@ app.jinja_env.filters["usd"] = usd
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
+# The maximum number of items the session stores 
+# before it starts deleting some, default 500
+app.config['SESSION_FILE_THRESHOLD'] = 100  
+
+sess = Session()
+sess.init_app(app)
 
 # calls SQLAlchemy database
 db = SQLAlchemy(app)
