@@ -30,15 +30,9 @@ app.jinja_env.filters["usd"] = usd
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=1)
-# The maximum number of items the session stores 
-# before it starts deleting some, default 500
-app.config['SESSION_FILE_THRESHOLD'] = 100  
+app.config["SESSION_TYPE"] = "sqlalchemy"
 
 sess = Session()
-sess.init_app(app)
 
 # calls SQLAlchemy database
 db = SQLAlchemy(app)
