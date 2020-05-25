@@ -8,7 +8,10 @@ the quote, buy and sell tabs to ensure a user inputs the correct stock symbol, t
 to buy/sell (a positive integer), and that a user does not over buy or over sell.
 
 The history tab lists out every single transaction a user has committed with date and time, the stock bought/sold,
-the price bought/sold at and the number of shares.
+the price bought/sold at and the number of shares. 
+
+## Database and Deployment
+All user information, buys/sells and transactions are stored in PostgreSQL accessible via Heroku. The web-app was also deployed on the Heroku server.
 
 ## Registration
 Select the 'Registration' link and type a username and password. You will be prompted if the username is already taken or passwords do not match. Once registered, you will automatically be directed to your homescreen
