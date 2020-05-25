@@ -31,7 +31,7 @@ If you decide you are ready to sell your stock, please navigate to the "Sell" pa
 ## History
 All of your transactions can be seen on the "History" page. Navigate there to see all your "Buys" and "Sells".
 
-# Log Out
+## Logout
 Once you are finishing trading for the day, please ensure you logout and you will be redirected to the login page.
 
 Happy Trading! 
