@@ -26,6 +26,8 @@ If you are a returing user, please login with your registered username and passw
 ## Homepage
 On your homepage you can see your current portfolio (which company stock you own, how many shares and the price you bought them for). You can navigate back to this page by selecting the "Home" link at the top. 
 
+<img src="https://media.giphy.com/media/YnMmTWb7iKcCmuiB4h/giphy.gif" width="480">
+
 ## Quote
 If you desire to see the current price of the stock, please navigate to the "Quote" page. There you can enter the ticker symbol and see the current price that stock is trading for. This is real time information pulled from the IEX API.
 
