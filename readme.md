@@ -16,6 +16,8 @@ All user information, buys/sells and transactions are stored in PostgreSQL acces
 ## Registration
 Select the 'Registration' link and type a username and password. You will be prompted if the username is already taken or passwords do not match. Once registered, you will automatically be directed to your homescreen
 
+<img src="https://imgur.com/yWLLNmy.gif" width="600">
+
 ## Login
 If you are a returing user, please login with your registered username and password. You will be prompted if they are incorrect.
 
